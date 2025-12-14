@@ -28,10 +28,10 @@ button { width:100%; padding:15px; font-size:18px; background:gold; border:none;
 </header>
 
 <div class="section">
-<label>Customer Name</label>
+<label><b>Customer Name</b></label>
 <input type="text" id="customerName" placeholder="Enter your name">
 
-<label>Table Number / Takeaway</label>
+<label><b>Table Number / Takeaway</b></label>
 <input type="text" id="tableNumber" placeholder="Table No or Takeaway">
 </div>
 
@@ -66,6 +66,13 @@ button { width:100%; padding:15px; font-size:18px; background:gold; border:none;
 </div>
 
 <div class="section">
+<h2>Smoking</h2>
+<div class="item">Hukka (350) <input type="number" min="0" data-name="Hukka" data-price="350"></div>
+<div class="item">Hukka Refill (200) <input type="number" min="0" data-name="Hukka Refill" data-price="200"></div>
+<div class="item">Extra Coal (50) <input type="number" min="0" data-name="Extra Coal" data-price="50"></div>
+</div>
+
+<div class="section">
 <div class="total" id="total">Total: Rs. 0</div>
 <button onclick="order()">Order on WhatsApp</button>
 </div>
@@ -77,6 +84,27 @@ button { width:100%; padding:15px; font-size:18px; background:gold; border:none;
 
 <script>
 const items = document.querySelectorAll('input[type=number]');
+const nameInput = document.getElementById('customerName');
+const tableInput = document.getElementById('tableNumber');
+
+/* Load saved name & table */
+window.onload = function () {
+  if (localStorage.getItem('customerName')) {
+    nameInput.value = localStorage.getItem('customerName');
+  }
+  if (localStorage.getItem('tableNumber')) {
+    tableInput.value = localStorage.getItem('tableNumber');
+  }
+};
+
+/* Save automatically */
+nameInput.addEventListener('input', () => {
+  localStorage.setItem('customerName', nameInput.value);
+});
+tableInput.addEventListener('input', () => {
+  localStorage.setItem('tableNumber', tableInput.value);
+});
+
 items.forEach(i => i.addEventListener('input', updateTotal));
 
 function updateTotal(){
@@ -86,8 +114,8 @@ function updateTotal(){
 }
 
 function order(){
-  let name = document.getElementById('customerName').value || 'Not given';
-  let table = document.getElementById('tableNumber').value || 'Not given';
+  let name = nameInput.value || 'Not given';
+  let table = tableInput.value || 'Not given';
   let msg = `Hello The Classy,%0AName: ${name}%0ATable: ${table}%0A%0AOrder:%0A`;
   let total = 0;
 
@@ -95,10 +123,13 @@ function order(){
     if(i.value > 0){
       msg += `${i.dataset.name} x ${i.value}%0A`;
       total += i.value * i.dataset.price;
+      i.value = 0;
     }
   });
 
   msg += `%0ATotal: Rs. ${total}`;
+  updateTotal();
+
   window.location.href = 'https://wa.me/9779817581814?text=' + msg;
 }
 </script>
